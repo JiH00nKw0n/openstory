@@ -1,0 +1,10 @@
+.env
+runs/*
+.claude/*
+*.jsonl
+*.db
+*.db-shm
+*.db-wal
+*.npy
+.idea/*
+*.json
