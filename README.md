@@ -47,7 +47,7 @@ The runner will:
 
 ```
 BASELINE EVALUATION
-✓ Baseline score: 0.756
+✓ Baseline score: 0.464
 
 GEPA OPTIMIZER SETUP
 ✓ GEPA optimizer configured
@@ -56,10 +56,10 @@ RUNNING OPTIMIZATION
 ✓ Optimization completed
 
 FINAL EVALUATION
-✓ Final score: 0.834
+✓ Final score: 0.533
 
 SUMMARY
-Baseline score: 0.756
-Final score: 0.834
-Improvement: +10.3%
+Baseline score: 0.464
+Final score: 0.533
+Improvement: +6.9%
 ```
