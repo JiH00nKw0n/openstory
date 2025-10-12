@@ -8,3 +8,6 @@ runs/*
 *.npy
 .idea/*
 *.json
+__pycache__/
+*.pyc
+.DS_Store
