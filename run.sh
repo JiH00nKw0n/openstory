@@ -4,7 +4,7 @@
 # Usage: ./run.sh [options]
 
 # Default values
-OPTIMIZER="sspo"
+OPTIMIZER="gepa"
 MODEL="openai/gpt-4.1-mini"
 REFLECTION_MODEL="openai/gpt-5-nano"
 TEMPERATURE=1.0
