@@ -19,6 +19,7 @@ if __name__ == "__main__":
 
     lm = dspy.LM("openai/gpt-4.1-mini", temperature=1.0, max_tokens=16384, num_retries=0, provider=None)
     dspy.configure(lm=lm)
+    dspy.settings.configure(provide_traceback=True)
     print(f"✓ Configured language model: {lm}")
 
     # Load the benchmark and view one example (following GEPA pattern)
@@ -27,12 +28,20 @@ if __name__ == "__main__":
     print(f"Dataset sizes: train={len(bench.train_set)}, val={len(bench.val_set)}, test={len(bench.test_set)}")
 
     print("\nExample from train set:")
-    pprint.pprint(bench.train_set[0])
+    print(bench.train_set[0])
 
     # Initialize program (following GEPA pattern)
     program = ifbench_metas[0].program[0]  # Get program from meta
     print(f"✓ Program initialized: {program}")
 
+    for name, pred in program.named_predictors():
+        print("================================")
+        print(f"Predictor: {name}")
+        print("================================")
+        print("Prompt:")
+        print(pred.signature.instructions)
+        print("*********************************")
+        
     # Run baseline evaluation (following GEPA pattern)
     print("\n" + "=" * 50)
     print("BASELINE EVALUATION")
@@ -44,7 +53,8 @@ if __name__ == "__main__":
         num_threads=40,  # Use more threads like GEPA
         display_table=True,
         display_progress=True,
-        max_errors=100 * len(bench.test_set)
+        max_errors=100 * len(bench.test_set),
+        provide_traceback=True,
     )
 
     print("Running baseline evaluation...")
@@ -87,10 +97,11 @@ if __name__ == "__main__":
         use_merge=True,
         set_for_merge_minibatch='val',
         track_scores_on='val',
-        max_metric_calls=700,
+        max_metric_calls=400,
         run_dir=runs_dir,
         logger=gepa_logger,
-        num_threads=40
+        num_threads=40,
+        add_format_failure_as_feedback=True,
     )
     print("✓ GEPA optimizer configured")
 
@@ -99,12 +110,12 @@ if __name__ == "__main__":
     print("RUNNING OPTIMIZATION")
     print("=" * 50)
 
-    print(f"Training with {len(bench.train_set)} examples, validating with {len(bench.val_set) // 2} examples")
+    print(f"Training with {len(bench.train_set)} examples, validating with {len(bench.val_set)} examples")
 
     optimized_program = optimizer.compile(
         ifbench_metas[0].program[0],  # Use program from meta like GEPA
         trainset=bench.train_set,
-        valset=bench.val_set[:len(bench.val_set) // 2],  # Use half of val set like GEPA
+        valset=bench.val_set,  # Use half of val set like GEPA
     )
     print("✓ Optimization completed")
 
@@ -137,7 +148,7 @@ if __name__ == "__main__":
     print(f"Baseline score: {baseline_score}")
     print(f"Final score: {final_score}")
     if final_score > baseline_score:
-        improvement = ((final_score - baseline_score) / baseline_score) * 100
+        improvement = ((final_score.score - baseline_score.score) / baseline_score.score) * 100
         print(f"Improvement: +{improvement:.1f}%")
     else:
         print("Performance change:", final_score.score - baseline_score.score)

@@ -1,9 +1,10 @@
 import random
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Callable, List, Type
+from typing import Callable, List, Type, Optional
 
 import dspy
+from dspy import Example
 
 dataset_size = {"full": None, "lite": 500, "tiny": 200, "test": 50}
 
@@ -18,20 +19,10 @@ class Benchmark(ABC):
         self.val_set = None
 
         self.init_dataset()
-        assert self.dataset is not None, "Dataset not initialized"
-        self.max_testset_size = dataset_size[dataset_mode]
 
-        # TODO: FIXME: "test" option is for debugging purposes only, should be removed for final release
-        if dataset_mode == "test":
-            self.dataset = self.trim_dataset(self.dataset, 60)
-            self.create_splits()
-
-        if not self.train_set or not self.test_set or not self.val_set:
-            self.create_splits()
-
-        self.train_set = self.trim_dataset(self.train_set, 150)
-        self.test_set = self.trim_dataset(self.test_set, 300)
-        self.val_set = self.trim_dataset(self.val_set, 300)
+        self.train_set: List[Example] = self.trim_dataset("train_set", 300)
+        self.val_set: List[Example] = self.trim_dataset("val_set", 300)
+        self.test_set: List[Example] = self.trim_dataset("test_set", None)
 
         assert self.train_set is not None, "Train set not initialized"
         assert self.test_set is not None, "Dev set not initialized"
@@ -43,25 +34,19 @@ class Benchmark(ABC):
         Initializes the dataset for the benchmark, and sets it to self.dataset.
         Each element in the dataset should be an instance of dspy.Example.
         """
-        return
+        raise NotImplementedError
 
-    def trim_dataset(self, dataset, size: int) -> None:
+    def trim_dataset(self, split: str, size: Optional[int] = None) -> List[Example]:
+
+        dataset: List[Example] = getattr(self, split, None)
+
         if size is None or size >= len(dataset):
             return dataset
+
         rng = random.Random()
-        rng.seed(1)
+        rng.seed(2025)
+
         return rng.sample(dataset, size)
-
-    def create_splits(self) -> None:
-        """
-        Creates the splits for the dataset (not including test).
-        Upon completion, self.train_set, self.test_set, and self.val_set should be set.
-        """
-
-        total_len = len(self.dataset)
-        self.test_set = self.dataset[: int(0.4 * total_len)]
-        self.val_set = self.dataset[int(0.4 * total_len): int(0.8 * total_len)]
-        self.train_set = self.dataset[int(0.8 * total_len):]
 
     def get_dataset(self):
         return self.dataset

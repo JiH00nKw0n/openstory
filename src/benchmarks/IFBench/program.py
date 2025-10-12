@@ -16,10 +16,11 @@ class EnsureCorrectResponse(dspy.Signature):
 
 class IFBenchCoT2StageProgram(dspy_program.LangProBeDSPyMetaProgram):
     def __init__(self):
+        super().__init__()
         self.generate_response_module = dspy.ChainOfThought(GenerateResponse)
         self.ensure_correct_response_module = dspy.ChainOfThought(EnsureCorrectResponse)
 
-    def __call__(self, prompt: str):
+    def forward(self, prompt: str):
         response = self.generate_response_module(query=prompt).response
         final_response = self.ensure_correct_response_module(query=prompt, response=response)
         return dspy.Prediction(response=final_response.final_response)

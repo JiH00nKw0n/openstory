@@ -45,7 +45,6 @@ def download_nltk_resources():
         nltk.data.find("tokenizers/punkt_tab")
     except LookupError:
         if RANK == "0":
-            nltk.download("punkt_tab")
             print("Downloaded punkt_tab on rank 0")
 
 
