@@ -9,7 +9,7 @@ MODEL="openai/gpt-4.1-mini"
 REFLECTION_MODEL="openai/gpt-5-nano"
 TEMPERATURE=1.0
 MAX_TOKENS=16384
-BENCHMARK="IFBench"
+BENCHMARK="InfoBench"
 DATASET_MODE="full"
 EVAL_THREADS=80
 
@@ -27,7 +27,7 @@ EVALUATOR_MODEL="openai/gpt-4o-mini"
 EVALUATOR_TEMPERATURE=0.3
 
 LOG_DIR="runs"
-RUN_BASELINE=false
+RUN_BASELINE=true
 DISPLAY_TABLE=false
 
 # Parse command line arguments

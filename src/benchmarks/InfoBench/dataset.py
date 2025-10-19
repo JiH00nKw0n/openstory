@@ -20,7 +20,6 @@ class InfoBenchBuilder(BaseBuilder):
         def _reformat_train_example(example):
             """Reformat train dataset to match test dataset format"""
             # Use ast.literal_eval instead of json.loads for Python-style strings
-            ground_truth = ast.literal_eval(example['ground_truth'])
             return {
                 "key": example["id"],
                 "prompt": example["instruction"] + "\n" + example["input"] if example['input'].strip() else example[
